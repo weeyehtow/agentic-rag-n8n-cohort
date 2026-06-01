@@ -1,0 +1,24 @@
+# Local RAG Course — Frequently Asked Questions
+
+## What is this course about?
+This course teaches you to build a local, self-hosted Retrieval-Augmented Generation (RAG)
+application using n8n as the orchestrator. Everything runs on your own machine in Docker.
+
+## What components make up the stack?
+Four Docker containers: n8n (the workflow engine), PostgreSQL (stores n8n's own data),
+Qdrant (the vector database that stores document embeddings), and Ollama (runs the AI models).
+
+## Which AI models does the course use?
+The chat model is llama3.2 and the embedding model is nomic-embed-text. The embedding model
+produces vectors with 768 dimensions, so the Qdrant collection is created with size 768 and
+Cosine distance.
+
+## Why does everything run in Docker?
+So the setup is identical on Windows, WSL2, and Mac. Containers talk to each other by name on
+an internal network: n8n reaches Ollama at http://ollama:11434 and Qdrant at http://qdrant:6333.
+
+## How is a document ingested for RAG?
+A document is loaded, split into smaller chunks, each chunk is converted into a 768-dimension
+vector by nomic-embed-text, and the vectors are stored in the Qdrant 'documents' collection.
+At query time the question is embedded, Qdrant finds the most similar chunks, and llama3.2
+answers using those chunks as context.

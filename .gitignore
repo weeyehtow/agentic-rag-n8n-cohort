@@ -1,0 +1,16 @@
+# --- OS cruft ---
+.DS_Store
+**/.DS_Store
+
+# --- Node / frontend ---
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# --- Secrets / machine-local state ---
+# Your working .env (encryption key + DB password) is generated from .env.example.
+self-hosted-ai-starter-kit/.env
+
+# --- Runtime drop-zone (don't commit ingested corpus copies) ---
+self-hosted-ai-starter-kit/shared/corpus/*
+!self-hosted-ai-starter-kit/shared/corpus/.gitkeep
