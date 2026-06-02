@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
-# verify_setup.sh — Pre-class acceptance gate for the n8n RAG course (macOS / Linux / WSL2).
+# verify_setup.sh — acceptance gate for the n8n RAG course (macOS / Linux / WSL2).
 # Exits 0 only when the full Dockerized stack is up and both Ollama models are present.
 #
-# Windows students: run this INSIDE your WSL2 terminal (where Docker Desktop's
-# WSL integration makes the `docker` command available), not in PowerShell.
+# Windows: run this INSIDE your WSL2 terminal (where Docker Desktop's WSL
+# integration makes the `docker` command available), not in PowerShell.
 #
-# Run it AFTER you have, at home:
+# Run it AFTER you have:
 #   1) started Docker Desktop
 #   2) cd into the self-hosted-ai-starter-kit folder
-#   3) docker compose --profile cpu up -d        (Mac / no GPU)
-#      docker compose --profile gpu-nvidia up -d (Windows/WSL2 with NVIDIA)
-#   4) docker exec ollama ollama pull llama3.2
-#   5) docker exec ollama ollama pull nomic-embed-text
+#   3) cp .env.example .env
+#   4) docker compose --profile cpu up -d        (DEFAULT - any machine)
+#      docker compose --profile gpu-nvidia up -d (ONLY with an NVIDIA GPU)
+#   5) docker exec ollama ollama pull llama3.2
+#   6) docker exec ollama ollama pull nomic-embed-text
 
 set -u
 
@@ -33,7 +34,7 @@ ok "docker compose available"
 # 3. The four stack containers are running.
 running() { docker ps --format '{{.Names}}' | grep -qi "$1"; }
 running '^n8n$'      || fail "n8n container not running. Start the stack: docker compose --profile cpu up -d (or --profile gpu-nvidia)"
-running '^ollama$'   || fail "ollama container not running. If you see a port 11434 conflict, QUIT your native Ollama app first (it's left over from the FastAPI course), then: docker compose --profile cpu up -d"
+running '^ollama$'   || fail "ollama container not running. If 'up' failed partway (e.g. a 'ports are not available' / 'forwards/expose ... 500' message), run 'docker compose --profile cpu down' then 'docker compose --profile cpu up -d' again. If you instead saw 'port already allocated' on 11434, quit any native Ollama first."
 running '^qdrant$'   || fail "qdrant container not running. Start the stack: docker compose --profile cpu up -d"
 PG=$(docker ps --format '{{.Names}}' | grep -i postgres | head -n1)
 [ -n "$PG" ] || fail "postgres container not running. Start the stack: docker compose --profile cpu up -d"
@@ -71,4 +72,4 @@ if command -v curl >/dev/null 2>&1; then
 fi
 
 echo
-echo "All checks passed. Your RAG stack is ready — see you in class."
+echo "All checks passed. Your RAG stack is ready."

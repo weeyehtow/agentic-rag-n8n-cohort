@@ -46,15 +46,20 @@ fi
 free_gb=$(df -Pg . 2>/dev/null | awk 'NR==2{print $4}')
 if [ -n "${free_gb:-}" ]; then
     if [ "$free_gb" -lt 15 ]; then
-        warn "Only ${free_gb} GB free here. The stack + models need ~15 GB. Free up space before class."
+        warn "Only ${free_gb} GB free here. The stack + models need ~15 GB. Free up space before continuing."
     else
         ok "${free_gb} GB free (enough for images + models)"
     fi
 fi
 
 echo
-echo "Preflight passed. Next:"
-echo "  1) clone the starter kit into your WSL2 home (NOT /mnt/c), then cd into it"
-echo "  2) docker compose --profile gpu-nvidia up -d   (NVIDIA GPU)  OR  --profile cpu up -d"
-echo "  3) docker exec ollama ollama pull llama3.2 && docker exec ollama ollama pull nomic-embed-text"
-echo "  4) bash scripts/verify_setup.sh"
+echo "Preflight passed. Next (run from the repo you already cloned):"
+echo "  1) cd self-hosted-ai-starter-kit"
+echo "  2) cp .env.example .env                       (required - Compose won't start without it)"
+echo "  3) docker compose --profile cpu up -d         (DEFAULT - any machine)"
+echo "     docker compose --profile gpu-nvidia up -d  (ONLY if you have an NVIDIA GPU)"
+echo "     -> wait until EVERY line says 'Started'. If 'up' fails partway, run"
+echo "        'docker compose --profile cpu down' then the 'up -d' line again before continuing."
+echo "  4) docker ps                                  (confirm 'ollama' is running before the next step)"
+echo "  5) docker exec ollama ollama pull llama3.2 && docker exec ollama ollama pull nomic-embed-text"
+echo "  6) cd .. && bash scripts/verify_setup.sh"

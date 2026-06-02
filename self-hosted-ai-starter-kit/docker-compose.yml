@@ -29,8 +29,12 @@ x-ollama: &service-ollama
   container_name: ollama
   networks: ['demo']
   restart: unless-stopped
-  ports:
-    - 11434:11434
+  # Ollama is deliberately NOT published to the host (no `ports:` here).
+  # Nothing on your laptop talks to Ollama directly: n8n reaches it by container
+  # name (http://ollama:11434) on the internal network, and you pull models with
+  # `docker exec ollama ollama pull ...`. Not forwarding this port shrinks the
+  # failure surface — both native-Ollama "port already allocated" conflicts and
+  # Docker Desktop "/forwards/expose ... 500" glitches involve forwarding 11434.
   volumes:
     - ollama_storage:/root/.ollama
 
