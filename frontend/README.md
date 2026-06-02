@@ -4,7 +4,7 @@ A minimal chat page that talks to your n8n RAG workflow over a **webhook**. One 
 one `fetch` POST, renders the answer, and keeps a **chat history** at the bottom. The whole point
 is to show that once n8n exposes a webhook, *any* app can use your RAG pipeline.
 
-> This is a **reference answer**. The exercise (STUDENT_GUIDE.md Step 8c) is to build your own
+> This is a **reference answer**. The exercise (in your course instructions) is to build your own
 > version by prompting your AI IDE — come here only if you get stuck.
 
 > **No Docker needed:** this runs on your laptop via Node/Vite and just calls n8n's webhook over
@@ -19,7 +19,7 @@ npm run dev
 Open the URL it prints (default <http://localhost:5173>).
 
 ## Connect it to n8n
-1. Build the webhook workflow in n8n (see **STUDENT_GUIDE.md Step 8**).
+1. Build the webhook workflow in n8n (covered in your course instructions).
 2. Copy the Webhook node's URL and paste it into `WEBHOOK_URL` at the top of `src/App.jsx`.
 3. Make sure the n8n Webhook node's **Allowed Origins (CORS)** allows `http://localhost:5173`
    (or `*` for class).

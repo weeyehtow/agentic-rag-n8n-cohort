@@ -21,4 +21,4 @@ These are the documents the RAG app ingests. `course-faq.txt` is the bundled dem
 | `.csv`, `.xlsx`, `.xls`, `.html` | yes | **Extract from File** with the matching operation |
 | `.docx` (Word) | no | save as PDF first, then ingest the PDF |
 
-See STUDENT_GUIDE.md Step 5 (and 5h for PDFs/other formats).
+See your course instructions for the ingestion steps (and the PDF / other-format setup).

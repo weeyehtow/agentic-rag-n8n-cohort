@@ -3,7 +3,7 @@
 # (Mac/Linux users can run it too). This is the gate you run BEFORE starting the
 # stack; verify_setup.sh is the gate you run AFTER the stack is up.
 #
-# One-time installs this assumes are already done (see STUDENT_GUIDE.md):
+# One-time installs this assumes are already done (see the README):
 #   - WSL2 installed (Windows:  wsl --install -d Ubuntu  then reboot)
 #   - Docker Desktop installed with the WSL2 backend, and WSL Integration ON for your distro
 
