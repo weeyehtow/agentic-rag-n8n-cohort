@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Troubleshooting — when something isn't working</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root { --fg:#24292f; --muted:#57606a; --border:#d0d7de; --codebg:#f6f8fa; --link:#0969da; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
+                   "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--fg); line-height: 1.6; max-width: 880px; margin: 0 auto; padding: 32px 20px 80px;
+      -webkit-text-size-adjust: 100%;
+    }
+    h1, h2, h3 { line-height: 1.25; margin-top: 1.6em; }
+    h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: .3em; }
+    h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: .3em; }
+    h3 { font-size: 1.2em; }
+    a { color: var(--link); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    p, li { font-size: 16px; }
+    code {
+      font-family: "SF Mono", SFMono-Regular, ui-monospace, Menlo, Consolas, monospace;
+      font-size: 85%; background: rgba(175,184,193,.2); padding: .2em .4em; border-radius: 6px;
+    }
+    pre {
+      position: relative; background: var(--codebg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px 16px; overflow: auto; margin: 12px 0;
+    }
+    pre code { background: none; padding: 0; font-size: 90%; white-space: pre; }
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px; font: 600 12px/1 inherit;
+      padding: 6px 10px; background: #fff; color: var(--fg); border: 1px solid var(--border);
+      border-radius: 6px; cursor: pointer; opacity: .65; transition: opacity .15s;
+    }
+    pre:hover .copy-btn { opacity: 1; }
+    .copy-btn.copied { background: #1f883d; color: #fff; border-color: #1f883d; opacity: 1; }
+    table { border-collapse: collapse; margin: 14px 0; display: block; overflow: auto; }
+    th, td { border: 1px solid var(--border); padding: 7px 13px; }
+    th { background: var(--codebg); }
+    blockquote {
+      margin: 14px 0; padding: 8px 16px; color: var(--muted);
+      border-left: 4px solid var(--border); background: #f6f8fa66; border-radius: 0 6px 6px 0;
+    }
+    blockquote p { margin: .4em 0; }
+    blockquote pre { background: #eef1f4; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  </style>
+  <script>
+    function fallbackCopy(text){
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      document.body.removeChild(ta);
+    }
+    document.addEventListener('DOMContentLoaded', function(){
+      document.querySelectorAll('pre').forEach(function(pre){
+        var btn = document.createElement('button');
+        btn.className = 'copy-btn'; btn.type = 'button'; btn.textContent = 'Copy';
+        btn.addEventListener('click', function(){
+          var codeEl = pre.querySelector('code');
+          var text = (codeEl ? codeEl.innerText : pre.innerText).replace(/\n$/,'');
+          var done = function(){ btn.textContent='Copied!'; btn.classList.add('copied');
+            setTimeout(function(){ btn.textContent='Copy'; btn.classList.remove('copied'); }, 1500); };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done, function(){ fallbackCopy(text); done(); });
+          } else { fallbackCopy(text); done(); }
+        });
+        pre.appendChild(btn);
+      });
+    });
+  </script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="troubleshooting--when-something-isnt-working">Troubleshooting —
+when something isn't working</h1>
+<p>Something not behaving? Find your symptom in the list below and
+follow the steps for it. These are the problems people hit most often,
+each with the exact fix.</p>
+<p>A few things that apply throughout:</p>
+<ul>
+<li><strong>On Windows, use the WSL2 (Ubuntu) terminal</strong> — not
+PowerShell. Your prompt should look like <code>you@PC:~$</code>. On
+<strong>Mac</strong>, use the built-in <strong>Terminal</strong>.</li>
+<li><strong>Run terminal commands from inside the
+<code>self-hosted-ai-starter-kit</code> folder</strong> unless a step
+says otherwise. (<code>docker ps</code> and <code>docker exec</code>
+work from any folder.)</li>
+<li>Restarting or recreating a container is safe — your work lives in
+Docker volumes. Only <code>docker compose down -v</code> deletes your
+data.</li>
+</ul>
+<p><strong>Find your symptom:</strong></p>
+<ol type="1">
+<li><a href="#1-read-file-says-access-to-the-file-is-not-allowed">Read
+File says "Access to the file is not allowed"</a></li>
+<li><a href="#2-read-file-says-no-files-found">Read File says "No
+file(s) found"</a></li>
+<li><a href="#3-a-node-spins-on-executing-node-forever-with-no-error">A
+node spins on "Executing node…" forever, with no error</a></li>
+<li><a href="#4-the-embeddings-model-isnt-in-the-dropdown">The
+embeddings model isn't in the dropdown</a></li>
+<li><a href="#5-npm-run-dev-says-vite-command-not-found">"npm run dev"
+says "vite: command not found"</a></li>
+<li><a href="#6-your-web-page-says-i-dont-know-or-shows-no-answer">Your
+web page says "I don't know" or shows no answer</a></li>
+<li><a href="#7-your-chat-answers-are-weak-or-say-i-dont-know">Your chat
+answers are weak or say "I don't know"</a></li>
+</ol>
+<hr />
+<h2 id="1-read-file-says-access-to-the-file-is-not-allowed">1. Read File
+says "Access to the file is not allowed"</h2>
+<p><strong>What's happening:</strong> n8n only reads files from one
+allowed folder, and the setting that points it at
+<code>/data/shared</code> isn't active in your running n8n. Usually it's
+missing from your <code>.env</code>, n8n was started before the setting
+was added, or (on Windows) your <code>.env</code> picked up
+Windows-style line endings.</p>
+<p>Work through these in order.</p>
+<p>First, check the setting is in your <code>.env</code>. In your
+terminal, run:</p>
+<pre><code>grep N8N_RESTRICT .env</code></pre>
+<p>If nothing prints, add it. In your terminal, run:</p>
+<pre><code>printf &#39;\nN8N_RESTRICT_FILE_ACCESS_TO=/data/shared\nN8N_BLOCK_FILE_ACCESS_TO_N8N_FILES=false\n&#39; &gt;&gt; .env</code></pre>
+<p>Don't run <code>cp .env.example .env</code> if you've already set
+things up — that overwrites your encryption key and database password,
+which breaks the credentials you created.</p>
+<p>Now restart n8n so it picks up the setting (a setting in
+<code>.env</code> only takes effect when the container starts). In your
+terminal, run:</p>
+<pre><code>docker compose --profile cpu up -d --force-recreate n8n</code></pre>
+<p>Check the setting is now active. In your terminal, run:</p>
+<pre><code>docker exec n8n printenv N8N_RESTRICT_FILE_ACCESS_TO</code></pre>
+<p>It should print <code>/data/shared</code>.</p>
+<p><strong>On Windows, also check for Windows line endings.</strong> In
+your terminal, run:</p>
+<pre><code>docker exec n8n printenv N8N_RESTRICT_FILE_ACCESS_TO | cat -A</code></pre>
+<p>If you see <code>/data/shared^M$</code>, that <code>^M</code> is a
+Windows carriage return — it sneaks in when <code>.env</code> is edited
+in a Windows editor. Remove it, then restart n8n. In your terminal,
+run:</p>
+<pre><code>sed -i &#39;s/\r$//&#39; .env</code></pre>
+<p>Then run:</p>
+<pre><code>docker compose --profile cpu up -d --force-recreate n8n</code></pre>
+<hr />
+<h2 id="2-read-file-says-no-files-found">2. Read File says "No file(s)
+found"</h2>
+<p><strong>What's happening:</strong> you gave n8n your computer's path.
+n8n runs inside Docker and only sees <code>/data/shared/...</code>.</p>
+<p>In the Read File node's <strong>File(s) Selector</strong>, use the
+path n8n sees:</p>
+<pre><code>/data/shared/corpus/nvidia-10k.pdf</code></pre>
+<p>Never use <code>/Users/...</code> (Mac), <code>C:\...</code> or
+<code>/mnt/c/...</code> (Windows).</p>
+<p>Check the file is actually inside the container. In your terminal,
+run:</p>
+<pre><code>docker exec n8n ls /data/shared/corpus/</code></pre>
+<p>If it's not listed, copy it in. From inside
+<code>self-hosted-ai-starter-kit</code>, run:</p>
+<pre><code>cp ../sample-docs/nvidia-10k.pdf shared/corpus/</code></pre>
+<hr />
+<h2 id="3-a-node-spins-on-executing-node-forever-with-no-error">3. A
+node spins on "Executing node…" forever, with no error</h2>
+<p><strong>What's happening:</strong> the n8n container is stuck — this
+isn't your workflow. Reading a small file is instant, so a long spin
+with no progress means the container needs a restart.</p>
+<p>To confirm: in your terminal, run:</p>
+<pre><code>docker exec n8n ls</code></pre>
+<p>If <code>docker ps</code> works but that command
+<strong>hangs</strong>, the container is stuck.</p>
+<p>To fix it:</p>
+<ol type="1">
+<li>Click the whale icon in your menu bar → <strong>Quit Docker
+Desktop</strong> (Force Quit if it won't close).</li>
+<li>Reopen Docker Desktop and wait until the whale icon stops
+moving.</li>
+<li>Bring the stack back. In your terminal, run:
+<pre><code>docker compose --profile cpu up -d</code></pre></li>
+<li>Reload <code>http://localhost:5678</code> in your browser and run
+your workflow again.</li>
+</ol>
+<p><strong>Is it actually stuck, or just slow?</strong> During ingestion
+the spinner is normal <strong>as long as</strong> your CPU is busy and
+the Qdrant count is climbing — a 131-page PDF takes a few minutes. Stuck
+means no activity at all for a minute or two.</p>
+<hr />
+<h2 id="4-the-embeddings-model-isnt-in-the-dropdown">4. The embeddings
+model isn't in the dropdown</h2>
+<p><strong>What's happening:</strong> in the <strong>Embeddings
+Ollama</strong> node, the Model dropdown shows only
+<code>llama3.2</code>, not <code>nomic-embed-text</code>. The dropdown
+lists only the models that are actually downloaded into Ollama — and the
+embeddings model hasn't been pulled yet.</p>
+<p>See which models you have. In your terminal, run:</p>
+<pre><code>docker exec ollama ollama list</code></pre>
+<p>Pull the embeddings model. In your terminal, run:</p>
+<pre><code>docker exec ollama ollama pull nomic-embed-text</code></pre>
+<p>Wait for it to print <strong>success</strong>, then check both are
+now there. In your terminal, run:</p>
+<pre><code>docker exec ollama ollama list</code></pre>
+<p>Back in n8n, reopen the <strong>Embeddings Ollama</strong> node (or
+refresh the browser tab). <code>nomic-embed-text</code> now appears in
+the Model dropdown — select it.</p>
+<p>The Embeddings node must use <code>nomic-embed-text</code>, not
+<code>llama3.2</code> — they do different jobs, and the embeddings model
+must match the one used when you ingested the document.</p>
+<hr />
+<h2 id="5-npm-run-dev-says-vite-command-not-found">5. "npm run dev" says
+"vite: command not found"</h2>
+<p><strong>What's happening:</strong> the page's packages aren't
+installed yet. A fresh copy of the repo has no <code>node_modules</code>
+folder, so you have to install once before you can run the page.</p>
+<p>In the <code>frontend</code> folder, install the packages. In your
+terminal, run:</p>
+<pre><code>npm install</code></pre>
+<p>Then start the page. In your terminal, run:</p>
+<pre><code>npm run dev</code></pre>
+<p>It prints a local address — open <code>http://localhost:5173</code>
+in your browser.</p>
+<p><strong>If <code>node</code> or <code>npm</code> is missing</strong>
+(you get <code>command not found</code>), or <code>node -v</code> shows
+a version below 18, install Node first:</p>
+<ul>
+<li><strong>Mac</strong> — in your terminal, run:
+<pre><code>brew install node</code></pre></li>
+<li><strong>Windows (WSL2)</strong> — install Node with nvm. In your
+terminal, run:
+<pre><code>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash</code></pre>
+then run:
+<pre><code>exec $SHELL</code></pre>
+then run:
+<pre><code>nvm install --lts</code></pre></li>
+</ul>
+<p>Check it worked — <code>node -v</code> should show v18 or higher —
+then run <code>npm install</code> and <code>npm run dev</code>
+again.</p>
+<hr />
+<h2 id="6-your-web-page-says-i-dont-know-or-shows-no-answer">6. Your web
+page says "I don't know" or shows no answer</h2>
+<p>If the page shows <em>anything</em> back — even "I don't know" — your
+webhook is working. The publish step, CORS, and the URL are all fine.
+The issue is the answer itself. There are two separate causes.</p>
+<p><strong>6a. The question isn't reaching the workflow.</strong></p>
+<p>Test the webhook directly. In your terminal, run:</p>
+<pre><code>curl -s -X POST http://localhost:5678/webhook/rag-chat -H &#39;Content-Type: application/json&#39; -d &#39;{&quot;question&quot;:&quot;What are NVIDIA&#39;&quot;&#39;&quot;&#39;s main risk factors?&quot;}&#39;</code></pre>
+<p>If the answer says something like <em>"no question provided"</em>,
+the question isn't wired into the chain. In the <strong>RAG
+webhook</strong> workflow, open the <strong>Question and Answer
+Chain</strong> node and check:</p>
+<ul>
+<li><strong>Source for Prompt (User Message)</strong> is set to
+<strong>Define below</strong>.</li>
+<li><strong>Prompt (User Message)</strong> is in
+<strong>Expression</strong> mode and reads
+<code>{{ $json.body.question }}</code>.</li>
+<li>The grey preview under that field shows your actual question, not a
+blank.</li>
+</ul>
+<p><strong>6b. The question gets through, but the answer is weak ("I
+don't know").</strong></p>
+<p>The <strong>RAG webhook</strong> workflow has its
+<strong>own</strong> nodes — tuning your chat workflow doesn't change
+them. Apply the same three settings here (see <a
+href="some-tuning-tips.md">some-tuning-tips.md</a>): set the Retriever
+<strong>Limit</strong> to 8, set the Ollama Chat Model's <strong>Context
+Length</strong> to 4096, and replace the chain's default <strong>System
+Prompt Template</strong>.</p>
+<p>Also check: the workflow is <strong>Active</strong> (published), and
+the Webhook node's <strong>Allowed Origins (CORS)</strong> is set to
+<code>*</code>. If the workflow isn't Active, the page gets "Failed to
+fetch".</p>
+<hr />
+<h2 id="7-your-chat-answers-are-weak-or-say-i-dont-know">7. Your chat
+answers are weak or say "I don't know"</h2>
+<p>Small models hold back, and the chain's default prompt actually tells
+them to. Three settings fix this — the full walkthrough is in <strong><a
+href="some-tuning-tips.md">some-tuning-tips.md</a></strong>:</p>
+<ol type="1">
+<li><strong>Vector Store Retriever → Limit → 8.</strong> The default of
+4 fetches too little context.</li>
+<li><strong>Ollama Chat Model → Options → Context Length →
+4096.</strong> This makes room for the retrieved text plus your
+question. If it's too small, Ollama cuts the start of the prompt —
+sometimes your question — and the model answers blind.</li>
+<li><strong>Question and Answer Chain → System Prompt Template.</strong>
+Replace the default <em>"…just say that you don't know"</em> with a
+prompt that answers from the context and only says it doesn't know when
+the context truly has nothing.</li>
+</ol>
+<p>Before changing settings, check three things: is your question
+actually answered in the document; did ingestion fill Qdrant (the
+collection should have a few hundred points); and is the retriever's
+embedding model <code>nomic-embed-text</code> — the same one you used to
+ingest.</p>
+</body>
+</html>

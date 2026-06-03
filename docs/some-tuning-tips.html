@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Tuning Tips — getting better answers (fewer "I don't
+know")</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root { --fg:#24292f; --muted:#57606a; --border:#d0d7de; --codebg:#f6f8fa; --link:#0969da; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
+                   "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--fg); line-height: 1.6; max-width: 880px; margin: 0 auto; padding: 32px 20px 80px;
+      -webkit-text-size-adjust: 100%;
+    }
+    h1, h2, h3 { line-height: 1.25; margin-top: 1.6em; }
+    h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: .3em; }
+    h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: .3em; }
+    h3 { font-size: 1.2em; }
+    a { color: var(--link); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    p, li { font-size: 16px; }
+    code {
+      font-family: "SF Mono", SFMono-Regular, ui-monospace, Menlo, Consolas, monospace;
+      font-size: 85%; background: rgba(175,184,193,.2); padding: .2em .4em; border-radius: 6px;
+    }
+    pre {
+      position: relative; background: var(--codebg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px 16px; overflow: auto; margin: 12px 0;
+    }
+    pre code { background: none; padding: 0; font-size: 90%; white-space: pre; }
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px; font: 600 12px/1 inherit;
+      padding: 6px 10px; background: #fff; color: var(--fg); border: 1px solid var(--border);
+      border-radius: 6px; cursor: pointer; opacity: .65; transition: opacity .15s;
+    }
+    pre:hover .copy-btn { opacity: 1; }
+    .copy-btn.copied { background: #1f883d; color: #fff; border-color: #1f883d; opacity: 1; }
+    table { border-collapse: collapse; margin: 14px 0; display: block; overflow: auto; }
+    th, td { border: 1px solid var(--border); padding: 7px 13px; }
+    th { background: var(--codebg); }
+    blockquote {
+      margin: 14px 0; padding: 8px 16px; color: var(--muted);
+      border-left: 4px solid var(--border); background: #f6f8fa66; border-radius: 0 6px 6px 0;
+    }
+    blockquote p { margin: .4em 0; }
+    blockquote pre { background: #eef1f4; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  </style>
+  <script>
+    function fallbackCopy(text){
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      document.body.removeChild(ta);
+    }
+    document.addEventListener('DOMContentLoaded', function(){
+      document.querySelectorAll('pre').forEach(function(pre){
+        var btn = document.createElement('button');
+        btn.className = 'copy-btn'; btn.type = 'button'; btn.textContent = 'Copy';
+        btn.addEventListener('click', function(){
+          var codeEl = pre.querySelector('code');
+          var text = (codeEl ? codeEl.innerText : pre.innerText).replace(/\n$/,'');
+          var done = function(){ btn.textContent='Copied!'; btn.classList.add('copied');
+            setTimeout(function(){ btn.textContent='Copy'; btn.classList.remove('copied'); }, 1500); };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done, function(){ fallbackCopy(text); done(); });
+          } else { fallbackCopy(text); done(); }
+        });
+        pre.appendChild(btn);
+      });
+    });
+  </script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="tuning-tips--getting-better-answers-fewer-i-dont-know">Tuning
+Tips — getting better answers (fewer "I don't know")</h1>
+<p>If the chat keeps replying <strong>"I don't know"</strong> even
+though the document covers the question, it's almost always one of three
+dials. The default setup is deliberately <em>conservative</em> (good
+against hallucination, bad for confident answers), so you have to loosen
+it.</p>
+<blockquote>
+<p>Do all three below, then ask your question again. Order of impact:
+<strong>Limit → prompt → num_ctx</strong>.</p>
+</blockquote>
+<hr />
+<h2 id="the-three-dials-in-the-chat-with-docs-workflow">The three dials
+(in the <strong>"Chat with docs"</strong> workflow)</h2>
+<h3 id="1-retriever-limit--8">1. Retriever <code>Limit</code> → 8</h3>
+<p>More retrieved chunks = more context for the model, so a small model
+stops hedging.</p>
+<ul>
+<li>Click the <strong>Vector Store Retriever</strong> node → set
+<strong>Limit</strong> to <code>8</code> (default is
+<code>4</code>).</li>
+</ul>
+<p><em>Don't over-raise it — <code>6</code>–<code>8</code> is the sweet
+spot for a document this size; too high dilutes the answer and slows it
+down.</em></p>
+<h3 id="2-ollama-chat-model-context-window-num_ctx--4096">2. Ollama Chat
+Model context window (<code>num_ctx</code>) → 4096</h3>
+<p>This one is easy to miss. If the retrieved chunks + your question
+exceed the model's context window, Ollama <strong>truncates the prompt
+from the start</strong> — often dropping your actual question — and you
+get "I don't know."</p>
+<ul>
+<li>Click the <strong>Ollama Chat Model</strong> node →
+<strong>Options</strong> → <strong>Add Option</strong> → <strong>Context
+Length</strong> (this is Ollama's <code>num_ctx</code>) → set
+<code>4096</code> (or <code>8192</code>).</li>
+<li><em>(While you're there: set <strong>Sampling Temperature</strong>
+to about <code>0.2</code> for focused, factual answers.)</em></li>
+<li><em>If your n8n version doesn't list "Context Length," skip it —
+dials 1 and 3 still help a lot.</em></li>
+</ul>
+<h3 id="3-the-qa-chain-system-prompt--replace-it">3. The Q&amp;A Chain
+system prompt → replace it</h3>
+<p>The <strong>Question and Answer Chain</strong> ships with this
+default prompt:</p>
+<blockquote>
+<p><em>"…If you don't know the answer, just say that you don't know,
+don't try to make up an answer."</em></p>
+</blockquote>
+<p>That line literally tells the model to refuse when unsure — a big
+reason for the "I don't know"s. Replace it:</p>
+<ul>
+<li>Click the <strong>Question and Answer Chain</strong> node → find the
+prompt field (the "You are an assistant…" text) → replace it with the
+prompt below.</li>
+<li><strong>Keep <code>Context: {context}</code> exactly</strong> — that
+placeholder is where n8n injects the retrieved chunks.</li>
+</ul>
+<pre><code>You are a precise assistant answering questions about the provided document.
+Use ONLY the retrieved context below to answer. Be direct and include as much
+relevant detail as the context supports. If the context partially answers the
+question, give that partial answer rather than refusing. Only say you don&#39;t know
+if the context contains no relevant information at all. Do not invent facts that
+are not in the context.
+----------------
+Context: {context}</code></pre>
+<p>What this changes: it removes the reflexive "just say you don't
+know," tells the model to give a partial answer rather than refuse, but
+<strong>keeps it grounded</strong> ("use ONLY the context", "don't
+invent facts") so you don't trade refusals for hallucinations.</p>
+<p><strong>Save the workflow → ask your question again.</strong></p>
+<hr />
+<h2 id="optional-a-bigger-model">Optional: a bigger model</h2>
+<p>A larger model follows instructions more confidently:</p>
+<pre class="bash"><code>docker exec ollama ollama pull mistral</code></pre>
+<p>Then in the <strong>Ollama Chat Model</strong> node, set
+<strong>Model</strong> to <code>mistral</code> (7B) instead of
+<code>llama3.2</code> (3B) and compare.</p>
+<hr />
+<h2 id="before-you-tune--three-quick-sanity-checks">Before you tune —
+three quick sanity checks</h2>
+<p>These <em>also</em> cause "I don't know," and no amount of tuning
+fixes them:</p>
+<ol type="1">
+<li><strong>Is the question actually answerable from the
+document?</strong> If it isn't in the source, "I don't know" is the
+<em>correct</em> answer.</li>
+<li><strong>Did ingestion populate Qdrant?</strong> The collection must
+have vectors (you should see a few hundred):
+<pre class="bash"><code>curl -s http://localhost:6333/collections/documents | grep -o &#39;&quot;points_count&quot;:[0-9]*&#39;</code></pre>
+If it's <code>0</code>, re-run the ingestion workflow first.</li>
+<li><strong>Same embedding model on both sides?</strong> The retriever's
+<strong>Embeddings Ollama</strong> must be <code>nomic-embed-text</code>
+— the <em>same</em> model used at ingestion — or the query vector won't
+match the stored vectors and retrieval returns nothing useful.</li>
+</ol>
+</body>
+</html>
