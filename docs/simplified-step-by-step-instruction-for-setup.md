@@ -2,6 +2,8 @@
 
 **These commands work exactly the same on Windows (running WSL2) and on Mac.**
 
+> 📋 **How to read this:** any command shown in a grey box is something you **type into your terminal and press Enter**.
+
 Follow each step in order. Read the short description first, then run the instruction. Only move on when a step finishes successfully.
 
 **You will move between just two folders.** Each step below tells you which one to be in:
@@ -45,6 +47,14 @@ cd agentic-rag-n8n-cohort
 ```
 
 > You are now inside the **`agentic-rag-n8n-cohort`** folder. Stay here for Step 4.
+
+> 💡 **Recommended — work inside your IDE.** Now that the repo is cloned, open it in **VS Code or
+> Antigravity (connected to WSL)** and run everything from its built-in **Terminal** panel — you'll
+> see your files on the left, and that terminal is already the WSL shell (not PowerShell). From the
+> `agentic-rag-n8n-cohort` folder, run `code .` (VS Code) or open the folder in Antigravity, then
+> open the Terminal panel.
+>
+> Prefer a plain terminal? That's fine too — just keep using the WSL Ubuntu terminal (Mac: Terminal).
 
 ---
 
