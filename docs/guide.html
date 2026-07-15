@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Local RAG with n8n — The Complete Guide</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root { --fg:#24292f; --muted:#57606a; --border:#d0d7de; --codebg:#f6f8fa; --link:#0969da; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif,
+                   "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--fg); line-height: 1.6; max-width: 880px; margin: 0 auto; padding: 32px 20px 80px;
+      -webkit-text-size-adjust: 100%;
+    }
+    h1, h2, h3 { line-height: 1.25; margin-top: 1.6em; }
+    h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: .3em; }
+    h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: .3em; }
+    h3 { font-size: 1.2em; }
+    a { color: var(--link); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    p, li { font-size: 16px; }
+    code {
+      font-family: "SF Mono", SFMono-Regular, ui-monospace, Menlo, Consolas, monospace;
+      font-size: 85%; background: rgba(175,184,193,.2); padding: .2em .4em; border-radius: 6px;
+    }
+    pre {
+      position: relative; background: var(--codebg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px 16px; overflow: auto; margin: 12px 0;
+    }
+    pre code { background: none; padding: 0; font-size: 90%; white-space: pre; }
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px; font: 600 12px/1 inherit;
+      padding: 6px 10px; background: #fff; color: var(--fg); border: 1px solid var(--border);
+      border-radius: 6px; cursor: pointer; opacity: .65; transition: opacity .15s;
+    }
+    pre:hover .copy-btn { opacity: 1; }
+    .copy-btn.copied { background: #1f883d; color: #fff; border-color: #1f883d; opacity: 1; }
+    table { border-collapse: collapse; margin: 14px 0; display: block; overflow: auto; }
+    th, td { border: 1px solid var(--border); padding: 7px 13px; }
+    th { background: var(--codebg); }
+    blockquote {
+      margin: 14px 0; padding: 8px 16px; color: var(--muted);
+      border-left: 4px solid var(--border); background: #f6f8fa66; border-radius: 0 6px 6px 0;
+    }
+    blockquote p { margin: .4em 0; }
+    blockquote pre { background: #eef1f4; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  </style>
+  <script>
+    function fallbackCopy(text){
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      document.body.removeChild(ta);
+    }
+    document.addEventListener('DOMContentLoaded', function(){
+      document.querySelectorAll('pre').forEach(function(pre){
+        var btn = document.createElement('button');
+        btn.className = 'copy-btn'; btn.type = 'button'; btn.textContent = 'Copy';
+        btn.addEventListener('click', function(){
+          var codeEl = pre.querySelector('code');
+          var text = (codeEl ? codeEl.innerText : pre.innerText).replace(/\n$/,'');
+          var done = function(){ btn.textContent='Copied!'; btn.classList.add('copied');
+            setTimeout(function(){ btn.textContent='Copy'; btn.classList.remove('copied'); }, 1500); };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done, function(){ fallbackCopy(text); done(); });
+          } else { fallbackCopy(text); done(); }
+        });
+        pre.appendChild(btn);
+      });
+    });
+  </script>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="local-rag-with-n8n--the-complete-guide">Local RAG with n8n — The
+Complete Guide</h1>
+<p>Build a <strong>fully local, self-hosted Retrieval-Augmented
+Generation (RAG)</strong> application — one that reads your own
+documents and answers questions about them — using <strong>n8n</strong>,
+<strong>PostgreSQL</strong>, <strong>Qdrant</strong>, and
+<strong>Ollama</strong>, all in Docker on your own machine. No cloud, no
+API keys, nothing leaves your laptop.</p>
+<p>By the end you'll have set up the stack, ingested a real document (we
+use Andrew Ng's book <em>Machine Learning Yearning</em>), chatted with
+it, logged every question and answer to a database, and wrapped the
+whole thing in your own web page.</p>
+<p>Work through it top to bottom. Each step is a short description
+followed by the exact command or click. Only move on when a step
+finishes successfully.</p>
+<blockquote>
+<p>📋 <strong>How to read this:</strong> any command in a grey box is
+something you <strong>type into your terminal and press Enter</strong>.
+Boxes marked <em>do this in n8n</em> are clicks in your browser, not the
+terminal.</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>What is RAG? (optional — skip if you just want to
+build)</strong> A language model like <code>llama3.2</code> only knows
+what it was trained on; it can't see <em>your</em> documents. RAG fixes
+that in two phases. <strong>Ingestion:</strong> split a document into
+chunks and use an <em>embedding model</em> to turn each chunk into a
+list of 768 numbers (a <em>vector</em>) that captures its meaning, then
+store those vectors in a vector database. <strong>Retrieval +
+generation:</strong> embed your <em>question</em> the same way, ask the
+database for the chunks closest to it, and hand those chunks to the
+model as context. The model then answers grounded in your document
+instead of guessing. Search by meaning, then let the model write the
+answer from what it found.</p>
+</blockquote>
+<hr />
+<h2 id="before-you-start--two-rules-and-two-folders">Before you start —
+two rules and two folders</h2>
+<p>You'll type addresses in two places, and the rule differs:</p>
+<ul>
+<li><strong>In your web browser</strong> → use
+<strong><code>localhost</code></strong> (e.g. n8n at
+<code>http://localhost:5678</code>). Your browser runs on your
+laptop.</li>
+<li><strong>Inside an n8n field</strong> (credentials and nodes) → use
+the service's <strong>container name</strong>, never
+<code>localhost</code> (e.g. <code>http://ollama:11434</code>). n8n runs
+<em>inside</em> Docker, where <code>localhost</code> would mean n8n
+itself. The exact address is given at each step.</li>
+</ul>
+<p>Many n8n fields have a <strong><code>Fixed</code> /
+<code>Expression</code></strong> toggle. <strong>Fixed</strong> holds
+literal text; <strong>Expression</strong> evaluates
+<code>{{ ... }}</code> as code. Rule of thumb: <strong>if what you type
+contains <code>{{ }}</code>, set the field to Expression</strong> —
+otherwise n8n stores it as plain characters and your data never flows. A
+correct expression shows a grey preview of its value below the
+field.</p>
+<p><strong>You will move between just two folders.</strong> Each step
+tells you which one to be in:</p>
+<ul>
+<li><strong><code>agentic-rag-n8n-cohort</code></strong> — the main
+folder (the helper scripts live here).</li>
+<li><strong><code>agentic-rag-n8n-cohort/self-hosted-ai-starter-kit</code></strong>
+— the stack folder (Docker runs from here).</li>
+</ul>
+<blockquote>
+<p>Lost track of where you are? Type <code>pwd</code> and press Enter —
+it prints your current folder.</p>
+</blockquote>
+<blockquote>
+<p>🆘 <strong>Stuck at any point?</strong> See the companion <strong><a
+href="troubleshooting-and-tuning.md">Troubleshooting &amp;
+Tuning</a></strong> doc — it lists the problems people hit most often,
+each with the exact fix.</p>
+</blockquote>
+<hr />
+<h1 id="part-a--set-up-the-stack">Part A — Set up the stack</h1>
+<p>The only thing you install by hand is <strong>Docker
+Desktop</strong>. Everything else — the pinned n8n starter kit, the
+helper scripts, the sample document, the SQL, and the web frontend —
+comes in the course repo you clone. You do <strong>not</strong> clone
+the starter kit separately, and you do <strong>not</strong> build any
+Docker images.</p>
+<h2 id="a1-open-the-right-terminal">A1. Open the right terminal</h2>
+<p>On <strong>Windows</strong> you must use the <strong>WSL2 Linux
+terminal</strong> — the <strong>Ubuntu app</strong>,
+<strong>NOT</strong> PowerShell and <strong>NOT</strong> Command Prompt.
+Most failed setups happen because commands were typed into PowerShell.
+On <strong>Mac</strong>, the built-in <strong>Terminal</strong> is
+correct. From here on, every command is identical on both.</p>
+<ul>
+<li><strong>Windows:</strong> click <strong>Start</strong>, type
+<strong>Ubuntu</strong>, open the <strong>Ubuntu</strong> app <em>(it
+may show as "Ubuntu" or "Ubuntu 24.04 LTS" — either is
+correct)</em>.</li>
+<li><strong>Mac:</strong> press <strong>Cmd + Space</strong>, type
+<strong>Terminal</strong>, open it.</li>
+</ul>
+<blockquote>
+<p>Check you're in the right place: your prompt should look like
+<code>you@PC:~$</code> (Linux), <strong>not</strong>
+<code>PS C:\Users\you&gt;</code> (PowerShell).</p>
+</blockquote>
+<h2 id="a2-install-docker-desktop-and-start-it">A2. Install Docker
+Desktop and start it</h2>
+<p>Docker Desktop runs the entire stack for you. Install it, start it,
+and wait until the whale icon stops animating. On
+<strong>Windows</strong> you must also turn on WSL Integration so Docker
+works from Ubuntu.</p>
+<ol type="1">
+<li>Download and install: <a
+href="https://www.docker.com/products/docker-desktop/">https://www.docker.com/products/docker-desktop/</a></li>
+<li>Start Docker Desktop; wait until the whale icon stops
+animating.</li>
+<li><strong>Windows only:</strong> Docker Desktop → <strong>Settings →
+Resources → WSL Integration</strong> → toggle <strong>ON</strong> your
+Ubuntu distro → <strong>Apply &amp; Restart</strong>.</li>
+</ol>
+<h2 id="a3-clone-the-course-repo">A3. Clone the course repo</h2>
+<p>This downloads everything you need into a new folder. The second line
+moves you inside it.</p>
+<pre class="bash"><code>git clone https://github.com/SwarupSG/agentic-rag-n8n-cohort.git
+cd agentic-rag-n8n-cohort</code></pre>
+<blockquote>
+<p>You are now inside
+<strong><code>agentic-rag-n8n-cohort</code></strong>. Stay here for
+A4.</p>
+</blockquote>
+<blockquote>
+<p>💡 <strong>Recommended — work inside your IDE.</strong> Open the
+cloned folder in <strong>VS Code or Antigravity (connected to
+WSL)</strong> and use its built-in <strong>Terminal</strong> panel —
+you'll see your files on the left, and that terminal is already the WSL
+shell (not PowerShell). Run <code>code .</code> (VS Code) or open the
+folder in Antigravity. Prefer a plain terminal? That's fine — just keep
+using the WSL Ubuntu terminal (Mac: Terminal).</p>
+</blockquote>
+<blockquote>
+<p>🛈 <strong>Windows/WSL2 performance:</strong> clone into your
+<strong>WSL2 home</strong> (e.g. <code>~/agentic-rag-n8n-cohort</code>),
+<strong>not</strong> under <code>/mnt/c/...</code> — Docker volumes on
+the Windows-mounted drive are dramatically slower.</p>
+</blockquote>
+<h2 id="a4-run-the-preflight-check">A4. Run the preflight check</h2>
+<p>This confirms your machine is ready — Docker reachable, enough disk
+space, correct terminal — before you start anything.</p>
+<p><strong>Folder: <code>agentic-rag-n8n-cohort</code>.</strong> Try
+this first:</p>
+<pre class="bash"><code>./scripts/preflight.sh</code></pre>
+<p>Only if that says <code>Permission denied</code>, use this
+instead:</p>
+<pre class="bash"><code>bash scripts/preflight.sh</code></pre>
+<p>Continue only when it ends with <strong>Preflight
+passed</strong>.</p>
+<h2 id="a5-create-the-env-file">A5. Create the .env file</h2>
+<p>The stack needs a small settings file named <code>.env</code>. Only a
+template exists so far. The first line moves you into the stack folder;
+the second copies the template into the real file.</p>
+<p><strong>Folder: <code>agentic-rag-n8n-cohort</code>.</strong></p>
+<pre class="bash"><code>cd self-hosted-ai-starter-kit
+cp .env.example .env</code></pre>
+<blockquote>
+<p>You are now inside
+<strong><code>self-hosted-ai-starter-kit</code></strong>. Stay here for
+A6–A8.</p>
+</blockquote>
+<blockquote>
+<p>🛈 The <code>.env</code> you just created already includes the
+file-access settings this course needs
+(<code>N8N_RESTRICT_FILE_ACCESS_TO=/data/shared</code>), so ingestion
+can read your document later.</p>
+</blockquote>
+<h2 id="a6-start-the-stack">A6. Start the stack</h2>
+<p>This downloads and starts all four containers (n8n, Ollama, Qdrant,
+Postgres). The <strong>first run pulls a few GB</strong>, so give it a
+few minutes. Every line of output should end with
+<strong><code>Started</code></strong>.</p>
+<p><strong>Folder: <code>self-hosted-ai-starter-kit</code>.</strong> Run
+the CPU line — it works on any machine:</p>
+<pre class="bash"><code>docker compose --profile cpu up -d</code></pre>
+<blockquote>
+<p><strong>Have an NVIDIA GPU?</strong> Run this
+<strong>instead</strong> — do not run both:</p>
+<pre class="bash"><code>docker compose --profile gpu-nvidia up -d</code></pre>
+</blockquote>
+<p>If <code>up</code> stops partway with an error (the stack is
+half-started), reset and try once more:</p>
+<pre class="bash"><code>docker compose --profile cpu down
+docker compose --profile cpu up -d</code></pre>
+<h2 id="a7-confirm-ollama-is-running">A7. Confirm Ollama is running</h2>
+<p>The next step reaches <em>into</em> the Ollama container, so it must
+be up. This lists running containers — look for
+<strong><code>ollama</code></strong>.</p>
+<p><strong>Folder:</strong> any (this works anywhere).</p>
+<pre class="bash"><code>docker ps</code></pre>
+<p>If you don't see <code>ollama</code>, repeat A6 first — otherwise the
+model pulls fail with <em>"container … is not running."</em></p>
+<h2 id="a8-pull-the-two-models">A8. Pull the two models</h2>
+<p>These download the AI models into the Ollama container — one for
+chat, one for turning text into vectors. They run <em>inside</em> the
+container, which is why Ollama had to be up first.</p>
+<p><strong>Folder:</strong> any. Run each and wait for
+<strong>success</strong>:</p>
+<pre class="bash"><code>docker exec ollama ollama pull llama3.2</code></pre>
+<pre class="bash"><code>docker exec ollama ollama pull nomic-embed-text</code></pre>
+<blockquote>
+<p>💡 <strong>Why two models?</strong> <code>llama3.2</code> writes
+answers; <code>nomic-embed-text</code> turns text into the 768-number
+vectors Qdrant searches. Different jobs, different models.</p>
+</blockquote>
+<h2 id="a9-verify-everything">A9. Verify everything</h2>
+<p>This checks the whole setup end to end — all containers up, both
+models present, n8n able to reach the other services. The script lives
+one level up, so first go back to the main folder.</p>
+<p><strong>Folder: <code>self-hosted-ai-starter-kit</code></strong> →
+move back:</p>
+<pre class="bash"><code>cd ..</code></pre>
+<blockquote>
+<p>You are now back in
+<strong><code>agentic-rag-n8n-cohort</code></strong>. Try this
+first:</p>
+</blockquote>
+<pre class="bash"><code>./scripts/verify_setup.sh</code></pre>
+<p>Only if that says <code>Permission denied</code>, use this
+instead:</p>
+<pre class="bash"><code>bash scripts/verify_setup.sh</code></pre>
+<p>You're ready when it prints <strong>All checks passed</strong>.</p>
+<h2 id="a10-open-the-apps">A10. Open the apps</h2>
+<p>Open these in your normal web browser (these <code>localhost</code>
+links work from your laptop). <strong>n8n</strong> is where you build
+everything; the <strong>Qdrant</strong> dashboard shows your vector
+database.</p>
+<ul>
+<li>n8n → <a href="http://localhost:5678">http://localhost:5678</a></li>
+<li>Qdrant → <a
+href="http://localhost:6333/dashboard">http://localhost:6333/dashboard</a></li>
+</ul>
+<p>✅ <strong>Part A done</strong> when <code>verify_setup.sh</code>
+passes and the n8n page loads.</p>
+<hr />
+<h1 id="part-b--wire-up-n8n-credentials--qdrant-collection">Part B —
+Wire up n8n (credentials + Qdrant collection)</h1>
+<p>n8n needs to know how to reach Ollama and Qdrant, and Qdrant needs a
+collection to store vectors in. About 10 minutes, mostly clicking.</p>
+<blockquote>
+<p><strong>Everything here happens inside n8n.</strong> There's no
+"Ollama" or "Qdrant" app to open — they're just <em>credential
+types</em> you pick from a list. Ollama has no screen at all; it's an
+API n8n talks to.</p>
+</blockquote>
+<h2 id="b1-create-your-n8n-owner-account">B1. Create your n8n owner
+account</h2>
+<p>Open <a href="http://localhost:5678">http://localhost:5678</a>. On
+first launch, n8n asks you to set up an owner — enter any email +
+password (it's local, stored only in your Postgres). You land on the
+workflow canvas.</p>
+<h2 id="b2-add-the-ollama-credential">B2. Add the Ollama credential</h2>
+<ol type="1">
+<li>Go to <a
+href="http://localhost:5678/home/credentials">http://localhost:5678/home/credentials</a>.</li>
+<li>Click <strong>Create credential</strong> → search
+<strong>Ollama</strong> → select <strong>Ollama account</strong>.</li>
+<li><strong>Base URL:</strong> <code>http://ollama:11434</code> ←
+container name, <em>not</em> the pre-filled
+<code>localhost:11434</code>.</li>
+<li><strong>API Key:</strong> leave <strong>blank</strong>.</li>
+<li><strong>Save.</strong> A green "Connection tested successfully"
+confirms n8n can reach Ollama.</li>
+</ol>
+<h2 id="b3-add-the-qdrant-credential">B3. Add the Qdrant credential</h2>
+<ol type="1">
+<li>Back on the Credentials page, click <strong>Create
+credential</strong> → search <strong>Qdrant</strong> → select it.</li>
+<li><strong>Qdrant URL:</strong> <code>http://qdrant:6333</code></li>
+<li><strong>API Key:</strong> the field is marked required, but local
+Qdrant has no auth — type any placeholder, e.g. <code>local</code>.
+Qdrant ignores it.</li>
+<li><strong>Save.</strong></li>
+</ol>
+<h2 id="b4-create-the-qdrant-collection">B4. Create the Qdrant
+collection</h2>
+<p>A collection is like a table for vectors. It must match the embedding
+model's size (<strong>768</strong> for <code>nomic-embed-text</code>)
+and use <strong>Cosine</strong> distance. Create it once from your
+terminal:</p>
+<pre class="bash"><code>curl -X PUT http://localhost:6333/collections/documents -H &#39;Content-Type: application/json&#39; -d &#39;{&quot;vectors&quot;:{&quot;size&quot;:768,&quot;distance&quot;:&quot;Cosine&quot;}}&#39;</code></pre>
+<p>Verify it exists (status <code>green</code>, points
+<code>0</code>):</p>
+<pre class="bash"><code>curl -s http://localhost:6333/collections/documents</code></pre>
+<blockquote>
+<p>💡 <strong>Why 768?</strong> <code>nomic-embed-text</code> turns each
+chunk into a list of 768 numbers. The collection's <code>size</code>
+must equal that, or inserts fail.</p>
+</blockquote>
+<p>✅ <strong>Part B done</strong> when both credentials save green and
+the <code>documents</code> collection shows <code>green</code>.</p>
+<hr />
+<h1 id="part-c--ingest-your-document">Part C — Ingest your document</h1>
+<p>This workflow reads a document, splits it into chunks, turns each
+chunk into a 768-number vector, and stores those vectors in the
+<code>documents</code> collection. Once stored, Part D can search
+them.</p>
+<p>Node chain:</p>
+<pre><code>Manual Trigger -&gt; Read Files -&gt; Extract from File -&gt; Qdrant Vector Store (Insert)
+                                                         |-- Embeddings Ollama   (sub-node)
+                                                         |-- Default Data Loader (sub-node)</code></pre>
+<h2 id="c1-stage-your-document">C1. Stage your document</h2>
+<p>n8n can only read files inside its <code>shared/</code> folder
+(mounted into the container at <code>/data/shared</code>). The sample
+PDF — <em>Machine Learning Yearning</em> — already came with your clone
+at <code>sample-docs/machine-learning-yearning.pdf</code>. Copy it into
+the drop-zone:</p>
+<p><strong>Folder: <code>agentic-rag-n8n-cohort</code>.</strong></p>
+<pre class="bash"><code>cp sample-docs/machine-learning-yearning.pdf self-hosted-ai-starter-kit/shared/corpus/</code></pre>
+<blockquote>
+<p>💡 <strong>Use your own document instead?</strong> Drop any
+<code>.pdf</code>, <code>.txt</code>, <code>.md</code>,
+<code>.csv</code>, <code>.xlsx</code>, or <code>.html</code> into
+<code>self-hosted-ai-starter-kit/shared/corpus/</code> and point the
+Read node (C3) at it. Word <code>.docx</code> isn't supported — save as
+PDF first.</p>
+</blockquote>
+<h2 id="c2-create-the-workflow-and-trigger--do-this-in-n8n">C2. Create
+the workflow and trigger — <em>do this in n8n</em></h2>
+<ol type="1">
+<li><strong>Create</strong> (top-left <strong>+</strong>) →
+<strong>Workflow</strong>. Name it <code>Ingest documents</code>.</li>
+<li>Click <strong>+</strong> on the canvas → search <strong>Manual
+Trigger</strong> → add <strong>When clicking 'Test
+workflow'</strong>.</li>
+</ol>
+<h2 id="c3-read-the-file-from-disk--do-this-in-n8n">C3. Read the file
+from disk — <em>do this in n8n</em></h2>
+<ol type="1">
+<li>Click <strong>+</strong> after the trigger → search
+<strong>Read/Write Files from Disk</strong> → add it.</li>
+<li><strong>Operation:</strong>
+<code>Read File(s) From Disk</code>.</li>
+<li><strong>File(s) Selector:</strong>
+<code>/data/shared/corpus/machine-learning-yearning.pdf</code></li>
+</ol>
+<blockquote>
+<p>⚠️ <strong>Use the container path, NOT your computer's path.</strong>
+n8n runs inside Docker, so it only sees <code>/data/shared/...</code>. A
+real disk path (<code>/Users/...</code> or <code>C:\Users\...</code>)
+gives <strong>"No file(s) found"</strong>. Always
+<code>/data/shared/corpus/machine-learning-yearning.pdf</code>.</p>
+</blockquote>
+<ol start="4" type="1">
+<li>Click <strong>Execute step</strong> to test just this node — you
+should see the file's binary in OUTPUT under a <code>data</code> field.
+<em>(Don't run the whole workflow yet — the later nodes don't
+exist.)</em></li>
+</ol>
+<h2 id="c4-add-the-extract-from-file-node--do-this-in-n8n">C4. Add the
+Extract from File node — <em>do this in n8n</em></h2>
+<p>A PDF is binary; n8n must pull the text out before chunking.</p>
+<ol type="1">
+<li>Click <strong>+</strong> after the Read node → search
+<strong>Extract from File</strong> → add it.</li>
+<li><strong>Operation:</strong> <code>Extract From PDF</code>.</li>
+<li><strong>Input Binary Field:</strong> <code>data</code> (the default
+— the field the Read node outputs).</li>
+</ol>
+<blockquote>
+<p>💡 Plain <code>.txt</code>/<code>.md</code> skip this node — connect
+Read straight to Qdrant and set the Data Loader's <strong>Type of
+Data</strong> to <code>Binary</code> (see C7).</p>
+</blockquote>
+<h2 id="c5-add-the-qdrant-vector-store-node-insert--do-this-in-n8n">C5.
+Add the Qdrant Vector Store node (insert) — <em>do this in n8n</em></h2>
+<ol type="1">
+<li>Click <strong>+</strong> after Extract → search <strong>Qdrant
+Vector Store</strong> → add it.</li>
+<li>In the action picker, choose <strong>Add documents to vector
+store</strong> (shown afterward as <strong>Insert
+Documents</strong>).</li>
+<li><strong>Credential:</strong> your <strong>Qdrant
+account</strong>.</li>
+<li><strong>Qdrant Collection:</strong> <code>From list</code> →
+<code>documents</code>.</li>
+<li><strong>Embedding Batch Size:</strong> leave the default
+(<code>200</code>).</li>
+</ol>
+<p>The node shows two required connectors — <strong>Embedding *</strong>
+and <strong>Document *</strong> (the <code>*</code> means required).
+Fill both next. <em>(Don't run it until both are connected.)</em></p>
+<h2 id="c6-attach-the-embeddings-sub-node--do-this-in-n8n">C6. Attach
+the Embeddings sub-node — <em>do this in n8n</em></h2>
+<ol type="1">
+<li>On the Qdrant node, click the <strong>Embeddings</strong> connector
+→ search <strong>Embeddings Ollama</strong> → add it.</li>
+<li><strong>Credential:</strong> your <strong>Ollama
+account</strong>.</li>
+<li><strong>Model:</strong> <code>nomic-embed-text:latest</code> ← must
+match the collection's 768 size.</li>
+</ol>
+<h2 id="c7-attach-the-default-data-loader-sub-node--do-this-in-n8n">C7.
+Attach the Default Data Loader sub-node — <em>do this in n8n</em></h2>
+<ol type="1">
+<li>On the Qdrant node, click the <strong>Document</strong> connector →
+search <strong>Default Data Loader</strong> → add it.</li>
+<li><strong>Type of Data:</strong> <code>JSON</code> ← because Extract
+already turned the PDF into a text field.</li>
+<li><strong>Mode:</strong> <code>Load All Input Data</code>.</li>
+<li><strong>Text Splitting:</strong> <code>Simple</code> — auto-applies
+chunk size 1000, overlap 200.</li>
+</ol>
+<h2 id="c8-run-it--do-this-in-n8n">C8. Run it — <em>do this in
+n8n</em></h2>
+<ol type="1">
+<li>Click <strong>Test workflow</strong> (the trigger's play button).
+Each node should go green; the Qdrant node reports how many vectors it
+inserted.</li>
+</ol>
+<blockquote>
+<p>⏱️ <strong>Expect about a minute</strong> for this book (~35 pages of
+text): it becomes a couple of hundred chunks, each embedded on CPU. A
+reliable "it's really working" signal is your machine's CPU spiking —
+the n8n spinner alone can be misleading. Watch the insert count
+climb.</p>
+</blockquote>
+<blockquote>
+<p>🛑 <strong>Spinner stuck with CPU idle</strong> for more than a
+minute or two? The n8n container has wedged (not your workflow). Fix and
+diagnosis in <strong><a
+href="troubleshooting-and-tuning.md#3-a-node-spins-on-executing-node-forever-with-no-error">Troubleshooting
+→ symptom 3</a></strong>.</p>
+</blockquote>
+<p>Verify the vectors landed (for this book, around 196):</p>
+<pre class="bash"><code>curl -s http://localhost:6333/collections/documents | grep -o &#39;&quot;points_count&quot;:[0-9]*&#39;</code></pre>
+<p>✅ <strong>Part C done</strong> when the run is green and
+<code>points_count</code> is greater than 0.</p>
+<blockquote>
+<p>💡 <strong>Mental model:</strong> the document is now "memorized" as
+vectors. In Part D we embed a <em>question</em> the same way, fetch the
+nearest chunks, and hand them to <code>llama3.2</code>.</p>
+</blockquote>
+<hr />
+<h1 id="part-d--chat-with-your-document">Part D — Chat with your
+document</h1>
+<p>You type a question → it's embedded → Qdrant returns the closest
+chunks → <code>llama3.2</code> answers grounded in them. This is a
+<strong>separate workflow</strong> from ingestion.</p>
+<p>Node tree:</p>
+<pre><code>Chat Trigger -&gt; Question and Answer Chain
+                   |-- Model:     Ollama Chat Model (llama3.2)
+                   |-- Retriever: Vector Store Retriever
+                                     |-- Qdrant Vector Store (Retrieve mode, collection &#39;documents&#39;)
+                                              |-- Embeddings Ollama (nomic-embed-text)</code></pre>
+<h2 id="d1-new-workflow--chat-trigger--do-this-in-n8n">D1. New workflow
++ Chat Trigger — <em>do this in n8n</em></h2>
+<ol type="1">
+<li><strong>Create</strong> → <strong>Workflow</strong>. Name it
+<code>Chat with docs</code>.</li>
+<li>Add node → search <strong>Chat Trigger</strong> → under
+<strong>Triggers</strong>, add <strong>On new Chat event</strong>.</li>
+</ol>
+<h2 id="d2-question-and-answer-chain--do-this-in-n8n">D2. Question and
+Answer Chain — <em>do this in n8n</em></h2>
+<ol type="1">
+<li>Click <strong>+</strong> after the Chat Trigger → search
+<strong>Question and Answer Chain</strong> → add it.</li>
+<li>Leave the defaults — it exposes two connectors:
+<strong>Model</strong> and <strong>Retriever</strong>.</li>
+</ol>
+<h2 id="d3-attach-the-chat-model--do-this-in-n8n">D3. Attach the chat
+model — <em>do this in n8n</em></h2>
+<ol type="1">
+<li>On the chain's <strong>Model</strong> connector → search
+<strong>Ollama Chat Model</strong> → add it.</li>
+<li><strong>Credential:</strong> your <strong>Ollama
+account</strong>.</li>
+<li><strong>Model:</strong> <code>llama3.2:latest</code>.</li>
+</ol>
+<h2 id="d4-attach-the-retriever--do-this-in-n8n">D4. Attach the
+retriever — <em>do this in n8n</em></h2>
+<ol type="1">
+<li>On the chain's <strong>Retriever</strong> connector → search
+<strong>Vector Store Retriever</strong> → add it.</li>
+<li>It exposes a <strong>Vector Store</strong> connector → search
+<strong>Qdrant Vector Store</strong> → add it.</li>
+<li>On that Qdrant node:
+<ul>
+<li><strong>Operation Mode:</strong>
+<code>Retrieve Documents (As Vector Store for Chain/Tool)</code>.</li>
+<li><strong>Credential:</strong> <strong>Qdrant account</strong>.</li>
+<li><strong>Qdrant Collection:</strong> <code>documents</code>.</li>
+</ul></li>
+</ol>
+<h2
+id="d5-attach-embeddings-to-the-retrievers-qdrant-node--do-this-in-n8n">D5.
+Attach embeddings to the retriever's Qdrant node — <em>do this in
+n8n</em></h2>
+<p>The query must be embedded with the <strong>same</strong> model used
+at ingestion.</p>
+<ol type="1">
+<li>On the Qdrant node's <strong>Embeddings</strong> connector → search
+<strong>Embeddings Ollama</strong> → add it.</li>
+<li><strong>Credential:</strong> <strong>Ollama account</strong>.</li>
+<li><strong>Model:</strong> <code>nomic-embed-text:latest</code>.</li>
+</ol>
+<h2 id="d6-ask-a-question--do-this-in-n8n">D6. Ask a question — <em>do
+this in n8n</em></h2>
+<ol type="1">
+<li>Click <strong>Open chat</strong> at the bottom of the canvas.</li>
+<li>Ask something the book covers, e.g. <em>"What is the difference
+between bias and variance?"</em> or <em>"How should I set up my dev and
+test sets?"</em></li>
+<li><code>llama3.2</code> answers using the retrieved chunks. The first
+answer is slower (the model loads into memory).</li>
+</ol>
+<p>✅ <strong>Part D done</strong> when you get a grounded answer that
+reflects the document's content.</p>
+<blockquote>
+<p>💡 <strong>The <code>*</code> is not an error.</strong> The
+<code>*</code> on the <strong>Model*</strong> /
+<strong>Retriever*</strong> / <strong>Vector Store*</strong> connectors
+marks a <em>required connection</em>, not a problem. The Vector Store
+Retriever is a thin adapter and may not show its own green tick even
+when it ran. Judge success by the <strong>Question and Answer
+Chain</strong> node turning green and the answer reflecting your
+document.</p>
+</blockquote>
+<h2 id="d7-tune-it-the-how-much-context-experiment--do-this-in-n8n">D7.
+Tune it: the "how much context?" experiment — <em>do this in
+n8n</em></h2>
+<p>Don't just set the best value — <strong>discover it.</strong> This is
+the most important lesson in RAG.</p>
+<p><strong>First, run with the default.</strong> The <strong>Vector
+Store Retriever</strong> has a <strong>Limit</strong> of <code>4</code>
+(it returns the 4 closest chunks). Ask: <em>"What should I do to reduce
+avoidable bias in my learning algorithm?"</em> The book answers this
+across several short chapters — train a bigger model, train longer, add
+or modify input features, reduce regularization, and so on. With only 4
+chunks, the small <code>llama3.2</code> model tends to give a
+<strong>thin</strong> answer, and because its default instructions tell
+it to say "I don't know" when unsure, it may even hedge with an <em>"I
+don't know … however …"</em> preamble.</p>
+<p><strong>Now raise the context.</strong> Open the <strong>Vector Store
+Retriever</strong> → set <strong>Limit</strong> to <code>8</code> → ask
+the same question again. With more of the relevant chapters in front of
+it, the answer fills out into a fuller list of techniques, and the
+hedging usually disappears.</p>
+<p><strong>The model, the document, and the question all stayed the same
+— the only change was going from 4 to 8 chunks of context.</strong></p>
+<blockquote>
+<p>🧪 The exact wording changes every run (the model is
+non-deterministic) — watch the <strong>pattern</strong>: 4 chunks →
+thinner and more likely to hedge; 8 chunks → fuller and more
+confident.</p>
+</blockquote>
+<blockquote>
+<p>🎓 <strong>The lesson:</strong> RAG has <strong>two tunable
+halves</strong> — <em>retrieval</em> (how much you fetch) and
+<em>generation</em> (the model). A weak answer isn't always a weak
+model. Always ask: "is it the search, or the model?" More levers —
+context length and the system prompt — are in <strong><a
+href="troubleshooting-and-tuning.md#tuning-getting-better-answers">Tuning</a></strong>.</p>
+</blockquote>
+<hr />
+<h1 id="part-e--log-every-qa-to-postgres">Part E — Log every Q&amp;A to
+Postgres</h1>
+<p>Real RAG apps keep a record of what was asked and answered — for
+auditing, debugging, and building evaluation sets. We append each
+exchange to a Postgres table.</p>
+<blockquote>
+<p>💡 Our stack already runs Postgres (it's where n8n stores its own
+data). We add one small table to it — we don't install a database.</p>
+</blockquote>
+<h2 id="e1-create-the-log-table-once">E1. Create the log table
+(once)</h2>
+<p><strong>Folder: <code>agentic-rag-n8n-cohort</code>.</strong> Apply
+the bundled SQL:</p>
+<pre class="bash"><code>docker exec -i $(docker ps --format &#39;{{.Names}}&#39; | grep postgres) psql -U root -d n8n &lt; sql/001_create_rag_chat_log.sql</code></pre>
+<p>This creates
+<code>rag_chat_log (id, question, answer, model, created_at)</code>.</p>
+<h2 id="e2-add-a-postgres-credential-in-n8n--do-this-in-n8n">E2. Add a
+Postgres credential in n8n — <em>do this in n8n</em></h2>
+<ol type="1">
+<li><a
+href="http://localhost:5678/home/credentials">http://localhost:5678/home/credentials</a>
+→ <strong>Create credential</strong> → search
+<strong>Postgres</strong>.</li>
+<li>Fill in the container-internal values:
+<ul>
+<li><strong>Host:</strong> <code>postgres</code> ⚠️ n8n pre-fills
+<code>localhost</code> — change it to <code>postgres</code> (the
+container name).</li>
+<li><strong>Database:</strong> <code>n8n</code> · <strong>User:</strong>
+<code>root</code> · <strong>Password:</strong> <code>password</code> ·
+<strong>Port:</strong> <code>5432</code></li>
+<li><strong>SSL:</strong> <code>Disable</code>.</li>
+</ul></li>
+<li><strong>Save.</strong></li>
+</ol>
+<blockquote>
+<p>ℹ️ You may see <strong>"No testing function found for this
+credential."</strong> That's <strong>not an error</strong> — the
+Postgres credential simply has no built-in test. Save it anyway; the
+real test is E4.</p>
+</blockquote>
+<h2
+id="e3-add-the-postgres-node-to-the-chat-workflow--do-this-in-n8n">E3.
+Add the Postgres node to the chat workflow — <em>do this in
+n8n</em></h2>
+<ol type="1">
+<li>In <strong>Chat with docs</strong>, click <strong>+</strong> after
+the <strong>Question and Answer Chain</strong>.</li>
+<li>Search <strong>Postgres</strong> → pick <strong>Insert rows in a
+table</strong>.</li>
+<li><strong>Credential:</strong> the one from E2.
+<strong>Schema:</strong> <code>public</code> · <strong>Table:</strong>
+<code>rag_chat_log</code> (<code>From list</code>).</li>
+<li><strong>Mapping Column Mode:</strong>
+<code>Map Each Column Manually</code>. n8n lists all 5 columns:
+<ul>
+<li><strong>🗑 Delete <code>id</code></strong> — Postgres auto-increments
+it; leaving <code>0</code> forces every row to id 0 and fails.</li>
+<li><strong>🗑 Delete <code>created_at</code></strong> — Postgres fills
+it with <code>NOW()</code> automatically.</li>
+<li><strong>question</strong> → toggle to <strong>Expression</strong>,
+enter
+<code>{{ $('When chat message received').item.json.chatInput }}</code></li>
+<li><strong>answer</strong> → toggle to <strong>Expression</strong>,
+enter <code>{{ $json.response }}</code></li>
+<li><strong>model</strong> → leave as <strong>Fixed</strong>, type
+<code>llama3.2</code></li>
+</ul></li>
+</ol>
+<blockquote>
+<p>⚠️ If a mapping shows empty, run the chat once, then click the field
+and pick the value from the <strong>input panel</strong> on the left —
+n8n inserts the correct expression for you.</p>
+</blockquote>
+<h2 id="e4-test-it--do-this-in-n8n-then-terminal">E4. Test it — <em>do
+this in n8n, then terminal</em></h2>
+<ol type="1">
+<li>Open chat → ask a question → wait for the answer.</li>
+<li>Confirm the row landed:</li>
+</ol>
+<pre class="bash"><code>docker exec $(docker ps --format &#39;{{.Names}}&#39; | grep postgres) psql -U root -d n8n -c &quot;SELECT id, left(question,40), left(answer,50), created_at FROM rag_chat_log ORDER BY id DESC LIMIT 5;&quot;</code></pre>
+<p>✅ <strong>Part E done</strong> when each chat question adds a row to
+<code>rag_chat_log</code>.</p>
+<hr />
+<h1 id="part-f--your-own-web-frontend-via-a-webhook">Part F — Your own
+web frontend via a webhook</h1>
+<p>So far you've chatted inside n8n. Now we expose the RAG pipeline as a
+<strong>webhook</strong> — a URL n8n listens on — so any app can use it,
+and point a small React page at it.</p>
+<blockquote>
+<p>💡 A webhook is just an HTTP endpoint. Your page POSTs a question to
+it; n8n runs the same RAG chain and POSTs the answer back. This is how
+real apps wrap an AI backend.</p>
+</blockquote>
+<p>Node tree (a <strong>third</strong> workflow):</p>
+<pre><code>Webhook (POST) -&gt; Question and Answer Chain -&gt; Respond to Webhook
+                     |-- Ollama Chat Model (llama3.2)
+                     |-- Vector Store Retriever -&gt; Qdrant -&gt; Embeddings Ollama</code></pre>
+<h2 id="f1-build-the-webhook-workflow--do-this-in-n8n">F1. Build the
+webhook workflow — <em>do this in n8n</em></h2>
+<ol type="1">
+<li><strong>Create</strong> → <strong>Workflow</strong>, name it
+<code>RAG webhook</code>.</li>
+<li>Add a <strong>Webhook</strong> node:
+<ul>
+<li><strong>HTTP Method:</strong> <code>POST</code></li>
+<li><strong>Path:</strong> <code>rag-chat</code> (the URL becomes
+<code>…/webhook/rag-chat</code>)</li>
+<li><strong>Respond:</strong>
+<code>Using 'Respond to Webhook' Node</code></li>
+<li><strong>Options → Allowed Origins (CORS):</strong> <code>*</code> ⚠️
+<strong>required</strong> — without it the browser blocks the
+cross-origin call from the page.</li>
+</ul></li>
+<li>Add a <strong>Question and Answer Chain</strong> after the Webhook:
+<ul>
+<li><strong>Source for Prompt (User Message):</strong> change to
+<strong><code>Define below</code></strong>.</li>
+<li><strong>Prompt (User Message)</strong> field (set to
+<strong>Expression</strong>):
+<code>{{ $json.body.question }}</code></li>
+<li>Attach the <strong>same</strong> sub-nodes as Part D: <strong>Ollama
+Chat Model</strong> (<code>llama3.2</code>) on Model, and <strong>Vector
+Store Retriever → Qdrant (Retrieve) → Embeddings Ollama</strong> on
+Retriever.</li>
+</ul></li>
+<li>Add a <strong>Respond to Webhook</strong> node after the chain:
+<ul>
+<li><strong>Respond With:</strong> <code>JSON</code></li>
+<li><strong>Response Body</strong> (toggle to
+<strong>Expression</strong>):
+<code>{ "answer": {{ JSON.stringify($json.response) }} }</code></li>
+</ul></li>
+</ol>
+<h2 id="f2-publish-the-workflow--do-this-first--do-this-in-n8n">F2.
+Publish the workflow — do this FIRST — <em>do this in n8n</em></h2>
+<p>Your page calls the webhook over HTTP, so the workflow must be
+<strong>live</strong>:</p>
+<ol type="1">
+<li>Click <strong>Save</strong>, then toggle the workflow
+<strong>Active</strong> (top-right). That is what "publishing"
+means.</li>
+<li>Open the <strong>Webhook</strong> node — it now shows a
+<strong>Production URL</strong>:
+<code>http://localhost:5678/webhook/rag-chat</code>. Copy it.</li>
+</ol>
+<blockquote>
+<p>⚠️ Skip this and the page shows <strong>"Failed to fetch" /
+404</strong> — an inactive workflow has no live production URL.</p>
+</blockquote>
+<h2 id="f3-run-the-page">F3. Run the page</h2>
+<p>The page runs on your <strong>laptop</strong> (Node/Vite), not in a
+container. Start its dev server:</p>
+<p><strong>Folder:
+<code>agentic-rag-n8n-cohort/frontend</code>.</strong></p>
+<pre class="bash"><code>cd frontend</code></pre>
+<pre class="bash"><code>npm install</code></pre>
+<pre class="bash"><code>npm run dev</code></pre>
+<p>It serves the page at <code>http://localhost:5173</code>.</p>
+<blockquote>
+<p>💡 <strong>No Node?</strong> If <code>npm</code> is missing or
+<code>node -v</code> is below 18, install Node first — see <strong><a
+href="troubleshooting-and-tuning.md#5-npm-run-dev-says-vite-command-not-found">Troubleshooting
+→ symptom 5</a></strong>.</p>
+</blockquote>
+<h2 id="f4-test-it">F4. Test it</h2>
+<ol type="1">
+<li>The shipped page already points <code>WEBHOOK_URL</code> at the
+Production URL from F2, so usually no change is needed. (To change it,
+edit <code>frontend/src/App.jsx</code>.)</li>
+<li>Open <a href="http://localhost:5173">http://localhost:5173</a>, type
+a question → <strong>Ask</strong> → the answer appears and is added to
+the chat history below.</li>
+</ol>
+<blockquote>
+<p>✅ <strong>The order that makes it work:</strong> (1) workflow
+<strong>Active</strong> (F2) → (2) <code>npm run dev</code> → (3) ask.
+If you hit "Failed to fetch", re-check that the workflow is
+<strong>Active</strong> and <strong>CORS = <code>*</code></strong> on
+the Webhook node.</p>
+</blockquote>
+<p>✅ <strong>Part F done</strong> when the page shows an answer pulled
+from your document and keeps a chat history.</p>
+<blockquote>
+<p>💡 <strong>Build it yourself (optional exercise).</strong> The
+shipped <code>frontend/src/App.jsx</code> is a reference answer. To
+build your own, prompt your AI IDE with: the stack (React + Vite, plain
+JS), the contract (POST <code>{ "question": "..." }</code> →
+<code>{ "answer": "..." }</code>), the UI (input + Ask button on top,
+chat history below), and the environment (page at :5173, webhook at
+:5678, CORS may need enabling). The request/response contract is the
+part most people forget — and it's what makes the page connect.</p>
+</blockquote>
+<hr />
+<h1 id="the-payoff--what-you-just-built">The payoff — what you just
+built</h1>
+<p>You now have a complete, fully-local RAG application: it ingests real
+documents, answers questions grounded in them, logs every exchange, and
+serves answers to your own web page — all on your machine, no cloud.</p>
+<p>The single most important thing you learned is the <strong>4 → 8
+context experiment</strong> in Part D: the same model gave a thinner
+answer with 4 retrieved chunks and a fuller one with 8. Nothing about
+the model changed — only <em>how much of your document it was
+shown</em>. <strong>RAG has two tunable halves — retrieval and
+generation.</strong> When an answer disappoints, ask first: <em>is it
+the search, or the model?</em></p>
+<h2 id="where-to-go-next">Where to go next</h2>
+<ul>
+<li><strong>Ingest your own corpus.</strong> Drop your own
+<code>.txt</code>, <code>.pdf</code>, <code>.csv</code>,
+<code>.xlsx</code>, or <code>.html</code> into
+<code>shared/corpus/</code> and re-run ingestion. (Word
+<code>.docx</code>? Save as PDF first.) Re-ingesting a fresh document?
+Clear the collection first (delete + recreate it, B4) so old vectors
+don't linger.</li>
+<li><strong>Improve weak answers.</strong> Raise the retriever Limit,
+the model's context length, and replace the default system prompt — the
+full walkthrough is in <strong><a
+href="troubleshooting-and-tuning.md#tuning-getting-better-answers">Tuning</a></strong>.</li>
+<li><strong>Try a bigger model.</strong> Pull <code>mistral</code> and
+switch the Ollama Chat Model; compare its confidence to
+<code>llama3.2</code>.</li>
+<li><strong>Build an eval set.</strong> Query <code>rag_chat_log</code>
+to review past answers, flag bad ones, and turn them into test questions
+— the start of measuring, not guessing, whether changes help.</li>
+</ul>
+<hr />
+<blockquote>
+<p>🆘 <strong>Something not working?</strong> Every common problem —
+file-access errors, the wedged-container spinner, a missing model,
+"vite: command not found", webhook "Failed to fetch", weak answers — is
+covered with an exact fix in <strong><a
+href="troubleshooting-and-tuning.md">Troubleshooting &amp;
+Tuning</a></strong>.</p>
+</blockquote>
+</body>
+</html>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>Troubleshooting — when something isn't working</title>
+  <title>Troubleshooting &amp; Tuning</title>
   <style>
     html {
       color: #1a1a1a;
@@ -237,8 +237,16 @@
   <![endif]-->
 </head>
 <body>
-<h1 id="troubleshooting--when-something-isnt-working">Troubleshooting —
-when something isn't working</h1>
+<h1 id="troubleshooting--tuning">Troubleshooting &amp; Tuning</h1>
+<p>Your companion to <strong>The Guide</strong>. Two halves:</p>
+<ul>
+<li><strong><a href="#troubleshooting">Troubleshooting</a></strong> —
+something broke; find your symptom and follow the exact fix.</li>
+<li><strong><a href="#tuning-getting-better-answers">Tuning</a></strong>
+— the app runs but answers are weak; three dials fix it.</li>
+</ul>
+<hr />
+<h2 id="troubleshooting">Troubleshooting</h2>
 <p>Something not behaving? Find your symptom in the list below and
 follow the steps for it. These are the problems people hit most often,
 each with the exact fix.</p>
@@ -270,7 +278,8 @@ says "vite: command not found"</a></li>
 <li><a href="#6-your-web-page-says-i-dont-know-or-shows-no-answer">Your
 web page says "I don't know" or shows no answer</a></li>
 <li><a href="#7-your-chat-answers-are-weak-or-say-i-dont-know">Your chat
-answers are weak or say "I don't know"</a></li>
+answers are weak or say "I don't know"</a> → see <strong><a
+href="#tuning-getting-better-answers">Tuning</a></strong></li>
 </ol>
 <hr />
 <h2 id="1-read-file-says-access-to-the-file-is-not-allowed">1. Read File
@@ -425,11 +434,11 @@ blank.</li>
 don't know").</strong></p>
 <p>The <strong>RAG webhook</strong> workflow has its
 <strong>own</strong> nodes — tuning your chat workflow doesn't change
-them. Apply the same three settings here (see <a
-href="some-tuning-tips.md">some-tuning-tips.md</a>): set the Retriever
-<strong>Limit</strong> to 8, set the Ollama Chat Model's <strong>Context
-Length</strong> to 4096, and replace the chain's default <strong>System
-Prompt Template</strong>.</p>
+them. Apply the same three settings here (see <strong><a
+href="#tuning-getting-better-answers">Tuning</a></strong> below): set
+the Retriever <strong>Limit</strong> to 8, set the Ollama Chat Model's
+<strong>Context Length</strong> to 4096, and replace the chain's default
+<strong>System Prompt Template</strong>.</p>
 <p>Also check: the workflow is <strong>Active</strong> (published), and
 the Webhook node's <strong>Allowed Origins (CORS)</strong> is set to
 <code>*</code>. If the workflow isn't Active, the page gets "Failed to
@@ -438,24 +447,91 @@ fetch".</p>
 <h2 id="7-your-chat-answers-are-weak-or-say-i-dont-know">7. Your chat
 answers are weak or say "I don't know"</h2>
 <p>Small models hold back, and the chain's default prompt actually tells
-them to. Three settings fix this — the full walkthrough is in <strong><a
-href="some-tuning-tips.md">some-tuning-tips.md</a></strong>:</p>
+them to. This isn't a bug — it's tuning. See the <strong><a
+href="#tuning-getting-better-answers">Tuning</a></strong> section below
+for the three dials that fix it.</p>
+<hr />
+<h1 id="tuning-getting-better-answers">Tuning: getting better
+answers</h1>
+<p>If the chat keeps replying <strong>"I don't know"</strong> even
+though the document covers the question, it's almost always one of three
+dials. The default setup is deliberately <em>conservative</em> (good
+against hallucination, bad for confident answers), so you have to loosen
+it.</p>
+<blockquote>
+<p>Do all three below, then ask your question again. Order of impact:
+<strong>Limit → prompt → num_ctx</strong>.</p>
+</blockquote>
+<h3 id="before-you-tune--three-quick-sanity-checks">Before you tune —
+three quick sanity checks</h3>
+<p>These <em>also</em> cause "I don't know," and no amount of tuning
+fixes them:</p>
 <ol type="1">
-<li><strong>Vector Store Retriever → Limit → 8.</strong> The default of
-4 fetches too little context.</li>
-<li><strong>Ollama Chat Model → Options → Context Length →
-4096.</strong> This makes room for the retrieved text plus your
-question. If it's too small, Ollama cuts the start of the prompt —
-sometimes your question — and the model answers blind.</li>
-<li><strong>Question and Answer Chain → System Prompt Template.</strong>
-Replace the default <em>"…just say that you don't know"</em> with a
-prompt that answers from the context and only says it doesn't know when
-the context truly has nothing.</li>
+<li><strong>Is the question actually answerable from the
+document?</strong> If it isn't in the source, "I don't know" is the
+<em>correct</em> answer.</li>
+<li><strong>Did ingestion populate Qdrant?</strong> The collection must
+have vectors (you should see a few hundred). In your terminal, run:
+<pre><code>curl -s http://localhost:6333/collections/documents | grep -o &#39;&quot;points_count&quot;:[0-9]*&#39;</code></pre>
+If it's <code>0</code>, re-run the ingestion workflow first.</li>
+<li><strong>Same embedding model on both sides?</strong> The retriever's
+<strong>Embeddings Ollama</strong> must be <code>nomic-embed-text</code>
+— the <em>same</em> model used at ingestion — or the query vector won't
+match the stored vectors and retrieval returns nothing useful.</li>
 </ol>
-<p>Before changing settings, check three things: is your question
-actually answered in the document; did ingestion fill Qdrant (the
-collection should have a few hundred points); and is the retriever's
-embedding model <code>nomic-embed-text</code> — the same one you used to
-ingest.</p>
+<h3 id="the-three-dials-in-the-chat-with-docs-workflow">The three dials
+(in the <strong>"Chat with docs"</strong> workflow)</h3>
+<p><strong>1. Retriever <code>Limit</code> → 8.</strong> More retrieved
+chunks = more context for the model, so a small model stops hedging.
+Click the <strong>Vector Store Retriever</strong> node → set
+<strong>Limit</strong> to <code>8</code> (default is <code>4</code>).
+<em>Don't over-raise it — <code>6</code>–<code>8</code> is the sweet
+spot for a document this size; too high dilutes the answer and slows it
+down.</em></p>
+<p><strong>2. Ollama Chat Model context window (<code>num_ctx</code>) →
+4096.</strong> Easy to miss. If the retrieved chunks plus your question
+exceed the model's context window, Ollama <strong>truncates the prompt
+from the start</strong> — often dropping your actual question — and you
+get "I don't know." Click the <strong>Ollama Chat Model</strong> node →
+<strong>Options</strong> → <strong>Add Option</strong> → <strong>Context
+Length</strong> → set <code>4096</code> (or <code>8192</code>).
+<em>(While you're there, set <strong>Sampling Temperature</strong> to
+about <code>0.2</code> for focused, factual answers. If your n8n version
+doesn't list "Context Length," skip it — dials 1 and 3 still help a
+lot.)</em></p>
+<p><strong>3. Replace the Q&amp;A Chain system prompt.</strong> The
+<strong>Question and Answer Chain</strong> ships with a default that
+says <em>"…if you don't know the answer, just say that you don't
+know"</em> — a big reason for the refusals. Click the <strong>Question
+and Answer Chain</strong> node → find the prompt field (the "You are an
+assistant…" text) → replace it with the prompt below. <strong>Keep
+<code>Context: {context}</code> exactly</strong> — that placeholder is
+where n8n injects the retrieved chunks.</p>
+<pre><code>You are a precise assistant answering questions about the provided document.
+Use ONLY the retrieved context below to answer. Be direct and include as much
+relevant detail as the context supports. If the context partially answers the
+question, give that partial answer rather than refusing. Only say you don&#39;t know
+if the context contains no relevant information at all. Do not invent facts that
+are not in the context.
+----------------
+Context: {context}</code></pre>
+<p>This removes the reflexive "just say you don't know" and tells the
+model to give a partial answer rather than refuse, but <strong>keeps it
+grounded</strong> ("use ONLY the context", "don't invent facts") so you
+don't trade refusals for hallucinations. <strong>Save the workflow → ask
+your question again.</strong></p>
+<blockquote>
+<p>🔁 <strong>The webhook workflow is separate.</strong> The <strong>RAG
+webhook</strong> has its own copy of these nodes — tuning "Chat with
+docs" doesn't touch it. Apply the same three dials there too (see
+symptom 6b above).</p>
+</blockquote>
+<h3 id="optional-a-bigger-model">Optional: a bigger model</h3>
+<p>A larger model follows instructions more confidently. In your
+terminal, run:</p>
+<pre><code>docker exec ollama ollama pull mistral</code></pre>
+<p>Then in the <strong>Ollama Chat Model</strong> node, set
+<strong>Model</strong> to <code>mistral</code> (7B) instead of
+<code>llama3.2</code> (3B) and compare.</p>
 </body>
 </html>

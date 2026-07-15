@@ -4,23 +4,21 @@ The starter code for building a **fully local, self-hosted Retrieval-Augmented G
 app on your own machine: **n8n** (workflow engine) + **PostgreSQL** + **Qdrant** (vector store) +
 **Ollama** (local LLM & embeddings) — all in Docker. No cloud, no API keys.
 
-> 📘 **The full step-by-step build (wiring n8n, ingesting, chatting) is walked through in class.**
-> This repo is the code you build *on top of* — it gives you the pinned stack, helper scripts,
-> sample documents, and a reference frontend. The setup, troubleshooting, and tuning guides you need
-> alongside class are in [`docs/`](docs/) — see below.
+> 📘 **Start here: [`docs/guide.md`](docs/guide.md)** — the complete step-by-step guide, from setting
+> up the stack to building your own web frontend. This repo bundles everything it refers to: the pinned
+> stack, helper scripts, the sample document, the SQL, and a reference frontend.
 
 ## Guides in this repo
 
-These live in [`docs/`](docs/). Each is provided as a **PDF** and an **HTML** page (with per-command
-Copy buttons) — use one of those to copy commands cleanly, rather than the raw `.md`. On Windows,
-every command in these guides is meant to be run from your **WSL2 Ubuntu terminal** (open the Ubuntu
-app from the Start menu), not PowerShell or Command Prompt.
+Both live in [`docs/`](docs/), each as a **PDF** and an **HTML** page (with per-command Copy buttons) —
+use one of those to copy commands cleanly, rather than the raw `.md`. On Windows, every command is meant
+to be run from your **WSL2 Ubuntu terminal** (open the Ubuntu app from the Start menu), not PowerShell
+or Command Prompt.
 
 | Guide | What it's for | Read it |
 |---|---|---|
-| **Setup — step by step** | Gets the whole stack running from scratch: install Docker, start the stack, pull the models, and verify it all works. Start here on day one. | [PDF](docs/simplified-step-by-step-instruction-for-setup.pdf) · [HTML](docs/simplified-step-by-step-instruction-for-setup.html) |
-| **Common student issues** | Troubleshooting handout for the problems people actually hit — the n8n node that spins forever, "Access to the file is not allowed", a missing embeddings model, `vite: command not found`, and webhook errors. | [PDF](docs/common-student-issues.pdf) · [HTML](docs/common-student-issues.html) |
-| **Some tuning tips** | What to do when the chatbot keeps answering "I don't know": raise the retriever limit, raise the model's context length, and replace the default system prompt. | [PDF](docs/some-tuning-tips.pdf) · [HTML](docs/some-tuning-tips.html) |
+| **The Guide** | The complete walk-through, end to end: set up the stack, wire up n8n, ingest a document, chat with it, log Q&A to Postgres, and build a webhook frontend. Start here on day one. | [PDF](docs/guide.pdf) · [HTML](docs/guide.html) |
+| **Troubleshooting & Tuning** | Your companion when something breaks or answers are weak — every common problem with an exact fix, plus the three dials that make answers better. | [PDF](docs/troubleshooting-and-tuning.pdf) · [HTML](docs/troubleshooting-and-tuning.html) |
 
 ## What's in here
 
