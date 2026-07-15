@@ -28,7 +28,7 @@ app from the Start menu), not PowerShell or Command Prompt.
 |---|---|
 | `self-hosted-ai-starter-kit/` | The pinned n8n stack (Docker Compose). You run everything from here. |
 | `scripts/` | `preflight.sh` (checks your environment) · `verify_setup.sh` (checks the running stack) |
-| `sample-docs/` | A sample document to ingest (`nvidia-10k.pdf`) plus notes on supported formats |
+| `sample-docs/` | A sample document to ingest (`machine-learning-yearning.pdf`) plus notes on supported formats |
 | `sql/` | `001_create_rag_chat_log.sql` — the table for logging questions & answers |
 | `frontend/` | A minimal React + Vite chat page (reference) that talks to your n8n webhook |
 

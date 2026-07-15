@@ -314,7 +314,7 @@ found"</h2>
 n8n runs inside Docker and only sees <code>/data/shared/...</code>.</p>
 <p>In the Read File node's <strong>File(s) Selector</strong>, use the
 path n8n sees:</p>
-<pre><code>/data/shared/corpus/nvidia-10k.pdf</code></pre>
+<pre><code>/data/shared/corpus/machine-learning-yearning.pdf</code></pre>
 <p>Never use <code>/Users/...</code> (Mac), <code>C:\...</code> or
 <code>/mnt/c/...</code> (Windows).</p>
 <p>Check the file is actually inside the container. In your terminal,
@@ -322,7 +322,7 @@ run:</p>
 <pre><code>docker exec n8n ls /data/shared/corpus/</code></pre>
 <p>If it's not listed, copy it in. From inside
 <code>self-hosted-ai-starter-kit</code>, run:</p>
-<pre><code>cp ../sample-docs/nvidia-10k.pdf shared/corpus/</code></pre>
+<pre><code>cp ../sample-docs/machine-learning-yearning.pdf shared/corpus/</code></pre>
 <hr />
 <h2 id="3-a-node-spins-on-executing-node-forever-with-no-error">3. A
 node spins on "Executing node…" forever, with no error</h2>
@@ -346,8 +346,8 @@ your workflow again.</li>
 </ol>
 <p><strong>Is it actually stuck, or just slow?</strong> During ingestion
 the spinner is normal <strong>as long as</strong> your CPU is busy and
-the Qdrant count is climbing — a 131-page PDF takes a few minutes. Stuck
-means no activity at all for a minute or two.</p>
+the Qdrant count is climbing — a full document can take a minute or two.
+Stuck means no activity at all for a minute or two.</p>
 <hr />
 <h2 id="4-the-embeddings-model-isnt-in-the-dropdown">4. The embeddings
 model isn't in the dropdown</h2>
@@ -407,7 +407,7 @@ webhook is working. The publish step, CORS, and the URL are all fine.
 The issue is the answer itself. There are two separate causes.</p>
 <p><strong>6a. The question isn't reaching the workflow.</strong></p>
 <p>Test the webhook directly. In your terminal, run:</p>
-<pre><code>curl -s -X POST http://localhost:5678/webhook/rag-chat -H &#39;Content-Type: application/json&#39; -d &#39;{&quot;question&quot;:&quot;What are NVIDIA&#39;&quot;&#39;&quot;&#39;s main risk factors?&quot;}&#39;</code></pre>
+<pre><code>curl -s -X POST http://localhost:5678/webhook/rag-chat -H &#39;Content-Type: application/json&#39; -d &#39;{&quot;question&quot;:&quot;What is the difference between bias and variance?&quot;}&#39;</code></pre>
 <p>If the answer says something like <em>"no question provided"</em>,
 the question isn't wired into the chain. In the <strong>RAG
 webhook</strong> workflow, open the <strong>Question and Answer

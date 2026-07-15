@@ -77,7 +77,7 @@ docker compose --profile cpu up -d --force-recreate n8n
 
 In the Read File node's **File(s) Selector**, use the path n8n sees:
 ```
-/data/shared/corpus/nvidia-10k.pdf
+/data/shared/corpus/machine-learning-yearning.pdf
 ```
 Never use `/Users/...` (Mac), `C:\...` or `/mnt/c/...` (Windows).
 
@@ -87,7 +87,7 @@ docker exec n8n ls /data/shared/corpus/
 ```
 If it's not listed, copy it in. From inside `self-hosted-ai-starter-kit`, run:
 ```
-cp ../sample-docs/nvidia-10k.pdf shared/corpus/
+cp ../sample-docs/machine-learning-yearning.pdf shared/corpus/
 ```
 
 ---
@@ -114,7 +114,7 @@ To fix it:
 4. Reload `http://localhost:5678` in your browser and run your workflow again.
 
 **Is it actually stuck, or just slow?** During ingestion the spinner is normal **as long as** your
-CPU is busy and the Qdrant count is climbing — a 131-page PDF takes a few minutes. Stuck means no
+CPU is busy and the Qdrant count is climbing — a full document can take a minute or two. Stuck means no
 activity at all for a minute or two.
 
 ---
@@ -193,7 +193,7 @@ CORS, and the URL are all fine. The issue is the answer itself. There are two se
 
 Test the webhook directly. In your terminal, run:
 ```
-curl -s -X POST http://localhost:5678/webhook/rag-chat -H 'Content-Type: application/json' -d '{"question":"What are NVIDIA'"'"'s main risk factors?"}'
+curl -s -X POST http://localhost:5678/webhook/rag-chat -H 'Content-Type: application/json' -d '{"question":"What is the difference between bias and variance?"}'
 ```
 If the answer says something like *"no question provided"*, the question isn't wired into the chain.
 In the **RAG webhook** workflow, open the **Question and Answer Chain** node and check:

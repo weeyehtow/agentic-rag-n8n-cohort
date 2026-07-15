@@ -48,7 +48,7 @@ export default function App() {
   return (
     <div style={styles.page}>
       <div style={styles.card}>
-        <h1 style={styles.h1}>Chat with the NVIDIA 10-K</h1>
+        <h1 style={styles.h1}>Chat with Machine Learning Yearning</h1>
         <p style={styles.sub}>Ask a question — answered by your local RAG pipeline via n8n.</p>
 
         <form onSubmit={ask} style={styles.form}>
@@ -56,7 +56,7 @@ export default function App() {
             style={styles.input}
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            placeholder="e.g. What are NVIDIA's main risk factors?"
+            placeholder="e.g. What is the difference between bias and variance?"
           />
           <button style={styles.button} disabled={loading}>
             {loading ? 'Thinking…' : 'Ask'}
