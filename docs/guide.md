@@ -443,6 +443,12 @@ The query must be embedded with the **same** model used at ingestion.
 3. `llama3.2` answers using the retrieved chunks. The first answer is slower (the model loads into
    memory).
 
+> 💡 **Ask specific, fuller questions.** RAG retrieves a handful of chunks *by meaning*, so how you
+> phrase the question matters. A short, vague query like *"bias"* embeds weakly and may pull the wrong
+> passage; *"What is bias in machine learning?"* pulls the right one. And broad "summarize the whole
+> document" or "what are the key topics?" questions are inherently weak here — RAG fetches relevant
+> *pieces*, not a whole-document overview. Ask about specific things the document actually covers.
+
 ✅ **Part D done** when you get a grounded answer that reflects the document's content.
 
 > 💡 **The `*` is not an error.** The `*` on the **Model\*** / **Retriever\*** / **Vector Store\***
